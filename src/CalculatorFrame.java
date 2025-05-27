@@ -12,25 +12,21 @@ public class CalculatorFrame extends JFrame {
     private boolean resetOnNextDigit = false;
 
     public CalculatorFrame() {
-        super("");
+        super("Calculadora per la Marineta");
 
         state   = new CalculatorState();
         history = new History();
-
-        // ─── Ventana principal ────────────────────────────────────────────────────
+        //ventana
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(600, 700);
         setLocationRelativeTo(null);
 
-        // ─── Panel principal con estilo ────────────────────────────────────────────
         JPanel content = Estetica.createMainPanel();
         setContentPane(content);
 
-        // ─── Display ───────────────────────────────────────────────────────────────
         display = Estetica.createDisplay();
         content.add(display, BorderLayout.NORTH);
 
-        // ─── Grid de botones 5×4 (números y operadores) ───────────────────────────
         JPanel buttonPanel = Estetica.createButtonGrid(6, 4);
         GridLayout grid4 = new GridLayout(6, 4, Theme.GAP, Theme.GAP);
         buttonPanel.setLayout(grid4);
@@ -58,69 +54,9 @@ public class CalculatorFrame extends JFrame {
             buttonPanel.add(btn);
         }
         content.add(buttonPanel, BorderLayout.CENTER);
-        /*
-        // ─── Panel inferior con punto, historial y funciones ────────────────────────
-        JPanel bottomPanel = Estetica.createButtonGrid(2, 5);
-        bottomPanel.setLayout(new GridLayout(2, 5, Theme.GAP, Theme.GAP));
-        
-        // Punto decimal
-        JButton dotButton = Estetica.createButton(".");
-        Estetica.styleAsNumber(dotButton);
-        dotButton.addActionListener(new ButtonClickListener());
-        bottomPanel.add(dotButton);
 
-        // Historial
-        JButton historialBtn = Estetica.createButton("HISTORIAL");
-        Estetica.styleAsFunction(historialBtn);
-        historialBtn.addActionListener(e -> {
-            StringBuilder sb = new StringBuilder("Historial de operaciones:\n");
-            for (String op : history.obtenerOperaciones()) {
-                sb.append(op).append("\n");
-            }
-            JOptionPane.showMessageDialog(this, sb.toString());
-        });
-        bottomPanel.add(historialBtn);
-
-        // Borrar historial
-        JButton borrarHistoryBtn = Estetica.createButton("CLEAR");
-        Estetica.styleAsFunction(borrarHistoryBtn);
-        borrarHistoryBtn.addActionListener(e -> {
-            if (JOptionPane.showConfirmDialog(this,
-                    "¿Borrar todo el historial?",
-                    "Confirmar",
-                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                history.borrarHistorial();
-                JOptionPane.showMessageDialog(this, "Historial borrado.");
-            }
-        });
-        //bottomPanel.add(borrarHistoryBtn);
-        
-        // AC
-        JButton clearBtn = Estetica.createButton("AC");
-        Estetica.styleAsFunction(clearBtn);
-        clearBtn.addActionListener(e -> {
-            display.setText("");
-            state.reset();
-            history.borrarHistorial();
-            resetOnNextDigit = true;
-        });
-        bottomPanel.add(clearBtn);
-        
-        // Backspace
-        JButton backBtn = Estetica.createButton("←");
-        Estetica.styleAsFunction(backBtn);
-        backBtn.addActionListener(e -> {
-            String t = display.getText();
-            if (t.length() > 1) display.setText(t.substring(0, t.length() - 1));
-            else                display.setText("0");
-        });
-        bottomPanel.add(backBtn);
-        
-        content.add(bottomPanel, BorderLayout.SOUTH);
-        */
         // ─── Key Bindings para teclado ─────────────────────────────────────────────
         JRootPane root = getRootPane();
-
         // Dígitos
         for (char c = '0'; c <= '9'; c++) {
             String k = String.valueOf(c);
@@ -186,7 +122,6 @@ public class CalculatorFrame extends JFrame {
     private class ButtonClickListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             String cmd = e.getActionCommand();
-
             // Dígitos
             if ("0123456789".contains(cmd)) {
                 if (resetOnNextDigit || "".equals(display.getText())) {
@@ -195,8 +130,7 @@ public class CalculatorFrame extends JFrame {
                     display.setText(display.getText() + cmd);
                 }
                 resetOnNextDigit = false;
-
-            // Punto decimal
+            // .
             } else if (".".equals(cmd)) {
                 if (resetOnNextDigit) {
                     display.setText("0.");
@@ -210,7 +144,7 @@ public class CalculatorFrame extends JFrame {
                     display.setText(t + ".");
                 }
 
-            // Operadores (+ - * /)
+            // op
             } else if ("+-*/".contains(cmd)) {
                 String txt = display.getText().trim();
                 String[] parts = txt.split(" ");
@@ -230,7 +164,7 @@ public class CalculatorFrame extends JFrame {
                 state.setOperator(cmd);
                 resetOnNextDigit = false;
 
-            // Igual
+            // =
             } else if ("=".equals(cmd)) {
                 String txt = display.getText().trim();
                 String[] parts = txt.split(" ");
@@ -253,7 +187,7 @@ public class CalculatorFrame extends JFrame {
                     resetOnNextDigit = true;
                 }
 
-            // Cambio de signo
+            // signo
             } else if ("±".equals(cmd)) {
                 double v = Double.parseDouble(display.getText());
                 display.setText(String.valueOf(Aritmetica.signo(v)));
@@ -291,9 +225,8 @@ public class CalculatorFrame extends JFrame {
             } else if ("←".equals(cmd)) {
                 String txt = display.getText();
                 if (txt.contains(" ")) {
-                    // Si está “número op “, borramos todo el segundo operando
                     int idx = txt.lastIndexOf(' ');
-                    display.setText(txt.substring(0, idx + 3)); // conserva "número op "
+                    display.setText(txt.substring(0, idx + 3)); //conserva "número op "
                 } else if (txt.length() > 1) {
                     display.setText(txt.substring(0, txt.length() - 1));
                 } else {
